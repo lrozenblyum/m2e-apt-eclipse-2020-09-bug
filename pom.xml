@@ -1,0 +1,89 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.leokom</groupId>
+	<artifactId>m2e-apt-eclipse-2020-09-bug</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<properties>
+		<hibernate-c3p0.version>5.2.6.Final</hibernate-c3p0.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java-version>1.8</java-version>
+	</properties>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-c3p0</artifactId>
+			<version>${hibernate-c3p0.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-jpamodelgen</artifactId>
+			<version>${hibernate-c3p0.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<!-- This dependency helps compiling the generated code when we run the project under JDK11.
+		Eclipse 2020-09 runs under JDK11+.
+		JDK8 contained XML bind-API but JDK11 doesn't contain it.
+		TODO: how to avoid using it when executing under JDK8? -->
+		<dependency>
+  			<groupId>jakarta.xml.bind</groupId>
+  			<artifactId>jakarta.xml.bind-api</artifactId>
+			<version>2.3.3</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.7.0</version>
+				<configuration>
+					<source>${java-version}</source>
+					<target>${java-version}</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	
+	<profiles>
+		<profile>
+			<!-- Eclipse specific: activate automatically when m2e plugin is installed -->
+			<id>m2e</id>
+			<activation>
+				<property>
+					<name>m2e.version</name>
+				</property>
+			</activation>
+			<properties>
+				<!-- Set "Maven Integration for Eclipse JDT APT" plugin option automatically 
+					run annotation processors within the incremental compilation -->
+				<m2e.apt.activation>jdt_apt</m2e.apt.activation>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<configuration>
+							<annotationProcessorPaths>
+								<path>
+									<groupId>org.hibernate</groupId>
+									<artifactId>hibernate-jpamodelgen</artifactId>
+									<version>${hibernate-c3p0.version}</version>
+								</path>
+							</annotationProcessorPaths>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	
+</project>
